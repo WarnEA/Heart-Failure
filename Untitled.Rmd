@@ -1,0 +1,97 @@
+---
+title: "Heart Failure Dataset Analysis"
+author: "Anthony Warnecke"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(plotly)
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This document provides an analysis of the Heart Failure Dataset, focusing on descriptive statistics, survival outcome analysis, and interactive visualizations.
+
+## Data Loading and Cleaning
+
+```{r data-loading}
+# Load the dataset
+data <- read.csv("Heart_Failure_Final.csv")
+
+# Remove unnecessary columns
+data <- data %>% select(-starts_with("Unnamed"))
+
+# Display the first few rows
+head(data)
+```
+
+## Descriptive Statistics
+
+### Summary of Variables
+
+```{r summary}
+summary(data)
+```
+
+### Visualizations of Key Features
+
+#### Age Distribution
+
+```{r age-distribution}
+p <- ggplot(data, aes(x = age)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "black") +
+  theme_minimal() +
+  labs(title = "Age Distribution", x = "Age", y = "Count")
+
+p
+```
+
+#### Death Event by Gender
+
+```{r death-by-gender}
+gender_plot <- ggplot(data, aes(x = factor(sex, labels = c("Female", "Male")), fill = factor(DEATH_EVENT, labels = c("Survived", "Died")))) +
+  geom_bar(position = "fill") +
+  theme_minimal() +
+  labs(title = "Death Event by Gender", x = "Gender", y = "Proportion", fill = "Outcome")
+
+gender_plot
+```
+
+## Survival Outcome Analysis
+
+### Serum Sodium vs. Death Event
+
+```{r sodium-death}
+sodium_plot <- ggplot(data, aes(x = factor(DEATH_EVENT, labels = c("Survived", "Died")), y = serum_sodium)) +
+  geom_boxplot(fill = "lightgreen") +
+  theme_minimal() +
+  labs(title = "Serum Sodium Levels by Survival Outcome", x = "Outcome", y = "Serum Sodium")
+
+sodium_plot
+```
+
+## Interactive Visualizations
+
+### Interactive Scatter Plot: Age vs. Serum Creatinine
+
+```{r interactive-plot, echo=FALSE}
+interactive_plot <- plot_ly(data, x = ~age, y = ~serum_creatinine, color = ~factor(DEATH_EVENT, labels = c("Survived", "Died")),
+                            type = "scatter", mode = "markers") %>%
+  layout(title = "Age vs. Serum Creatinine with Survival Outcome",
+         xaxis = list(title = "Age"),
+         yaxis = list(title = "Serum Creatinine"))
+
+interactive_plot
+```
+
+## Conclusion
+
+This analysis provides insights into the key features of the Heart Failure Dataset and their relationships to survival outcomes. Further analysis could include predictive modeling or more detailed survival analysis.
